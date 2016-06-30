@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Define the behavior of the pyramid obstacle and when to damage the player
+/// </summary>
 public class PyramidObstacle : MonoBehaviour {
     // serialized private variables
     [SerializeField] private int damage = 50;

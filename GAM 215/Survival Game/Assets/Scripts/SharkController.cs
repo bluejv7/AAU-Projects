@@ -2,7 +2,7 @@
 using System.Collections;
 
 /// <summary>
-/// The controller/AI for the shark
+/// The controller/AI for the seek and destroy shark
 /// </summary>
 public class SharkController : MonoBehaviour {
     // Public variables

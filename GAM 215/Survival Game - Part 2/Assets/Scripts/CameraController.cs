@@ -5,7 +5,20 @@ using System.Collections;
 /// Handle camera controls from mouse movement
 /// </summary>
 public class CameraController : MonoBehaviour {
+    // Header declaration
+    [Header("Input Axis Names")]
+
     // Serialized private variables
+
+    /// <summary>
+    /// Input name for moving the camera in the x axis
+    /// </summary>
+    [SerializeField] private string moveCameraInputX = "Mouse X";
+
+    /// <summary>
+    /// Input name for moving the camera in the y axis
+    /// </summary>
+    [SerializeField] private string moveCameraInputY = "Mouse Y";
 
     /// <summary>
     /// Object used for vertical tilting of the camera
@@ -54,10 +67,13 @@ public class CameraController : MonoBehaviour {
     /// <summary>
     /// Handle rotation of the camera
     /// </summary>
-    private void RotateCamera()
+    private void RotateCamera(float rotateX, float rotateY)
     {
-        this.transform.Rotate(0, Input.GetAxis("Mouse X") * cameraSensitivityX, 0);
-        currentTilt = Mathf.Clamp(currentTilt + invertModifier * Input.GetAxis("Mouse Y") * cameraSensitivityY, minTilt, maxTilt);
+        // Rotate camera left/right
+        this.transform.Rotate(0, rotateX * cameraSensitivityX, 0);
+
+        // Rotate camera up/down
+        currentTilt = Mathf.Clamp(currentTilt + invertModifier * rotateY * cameraSensitivityY, minTilt, maxTilt);
         cameraTarget.localEulerAngles = new Vector3(currentTilt, 0, 0);
     }
 
@@ -75,6 +91,8 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private void Update () {
         // Handle player's camera rotation
-        RotateCamera();
+        float rotateX = Input.GetAxis(moveCameraInputX);
+        float rotateY = Input.GetAxis(moveCameraInputY);
+        RotateCamera(rotateX, rotateY);
     }
 }

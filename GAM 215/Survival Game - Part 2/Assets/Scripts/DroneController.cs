@@ -33,7 +33,7 @@ public class DroneController : MonoBehaviour {
     /// <summary>
     /// Apply damage to player if triggered by player
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="other">The collider that triggered this event</param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")

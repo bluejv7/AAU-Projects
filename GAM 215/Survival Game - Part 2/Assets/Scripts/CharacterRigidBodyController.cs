@@ -28,29 +28,9 @@ public class CharacterRigidBodyController : MonoBehaviour
     [SerializeField] private Text endingText;
 
     /// <summary>
-    /// Object used for vertical tilting of the camera
+    /// The height at which the player dies
     /// </summary>
-    [SerializeField] private Transform cameraTarget = null;
-
-    /// <summary>
-    /// Minimum tilt value for the x-rotation of the camera
-    /// </summary>
-    [SerializeField] private float minTilt = -50.0f;
-
-    /// <summary>
-    /// Maximum tilt value fo the x-rotation of the camera
-    /// </summary>
-    [SerializeField] private float maxTilt = 30.0f;
-
-    /// <summary>
-    /// How sensitive the camera is when looking left/right
-    /// </summary>
-    [SerializeField] private float cameraSensitivityX = 2.5f;
-
-    /// <summary>
-    /// How sensitive the camera is when looking up/down
-    /// </summary>
-    [SerializeField] private float cameraSensitivityY = 2.0f;
+    [SerializeField] private float deathHeight = -5.0f;
 
     // Movement properties
 
@@ -161,11 +141,6 @@ public class CharacterRigidBodyController : MonoBehaviour
     /// </summary>
     private Vector3 _colliderBottomOffset = Vector3.zero;
 
-    /// <summary>
-    /// Current x-rotation of the camera
-    /// </summary>
-    private float currentTilt = 0;
-
     // Public methods
 
     /// <summary>
@@ -232,16 +207,6 @@ public class CharacterRigidBodyController : MonoBehaviour
     }
 
     /// <summary>
-    /// Handle rotation of the camera
-    /// </summary>
-    private void RotateCamera()
-    {
-        this.transform.Rotate(0, Input.GetAxis("Mouse X") * cameraSensitivityX, 0);
-        currentTilt = Mathf.Clamp(currentTilt - Input.GetAxis("Mouse Y") * cameraSensitivityY, minTilt, maxTilt);
-        cameraTarget.localEulerAngles = new Vector3(currentTilt, 0, 0);
-    }
-
-    /// <summary>
     /// Freeze rotation on our Rigidbody so our character doesn't fall over
     /// and initialize some variables
     /// </summary>
@@ -294,8 +259,11 @@ public class CharacterRigidBodyController : MonoBehaviour
         // Apply velocity to `rb`
         rb.velocity = localVelocity;
 
-        // Handle player's camera rotation
-        RotateCamera();
+        // If we fall below deathHeight, apply all the player's health as damage
+        if (this.transform.position.y < deathHeight)
+        {
+            Damage(health);
+        }
     }
 
     /// <summary>

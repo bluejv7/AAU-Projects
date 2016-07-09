@@ -30,6 +30,10 @@ public class DroneController : MonoBehaviour {
         this.transform.Rotate(0, angle, 0);
 	}
 
+    /// <summary>
+    /// Apply damage to player if triggered by player
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")

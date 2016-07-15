@@ -95,8 +95,6 @@ public class CameraController : MonoBehaviour {
 
         // Initialize cameraTarget (assuming target is the parent)
         cameraTarget = this.transform.FindChild("Camera Target").transform;
-
-        Cursor.lockState = CursorLockMode.Locked;
 	}
 	
 	/// <summary>

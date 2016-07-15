@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shooting Gallery.CSharp", "Shooting Gallery.CSharp.csproj", "{F956F0E9-2028-F010-A027-DEC443F0785F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shooting Gallery.CSharp.Editor", "Shooting Gallery.CSharp.Editor.csproj", "{A6B80CFB-22A1-6324-AAB4-D578E5EB2F71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{F956F0E9-2028-F010-A027-DEC443F0785F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F956F0E9-2028-F010-A027-DEC443F0785F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F956F0E9-2028-F010-A027-DEC443F0785F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6B80CFB-22A1-6324-AAB4-D578E5EB2F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6B80CFB-22A1-6324-AAB4-D578E5EB2F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6B80CFB-22A1-6324-AAB4-D578E5EB2F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6B80CFB-22A1-6324-AAB4-D578E5EB2F71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -48,6 +48,11 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     [SerializeField] private float strafingSpeed = 4.0f;
 
+    /// <summary>
+    /// The amount of damage the player does
+    /// </summary>
+    [SerializeField] private int damage = 1;
+
     #endregion
 
     #region Calculation Variables
@@ -64,6 +69,26 @@ public class PlayerController : MonoBehaviour {
     /// The velocity in relation to the direction the character is facing
     /// </summary>
     private Vector3 localVelocity = Vector3.zero;
+
+    /// <summary>
+    /// Reference variable for the ray we will cast
+    /// </summary>
+    private Ray ray;
+
+    /// <summary>
+    /// Reference variable for the raycast return
+    /// </summary>
+    private RaycastHit hitInfo;
+
+    /// <summary>
+    /// Reference variable for the hitInfo collider
+    /// </summary>
+    private Collider hitCollider = null;
+
+    /// <summary>
+    /// The vector representing the center of the screen (probably should be some constant, but not sure how to do it in C#)
+    /// </summary>
+    private Vector3 centerVector = new Vector3(0.5f, 0.5f, 0);
 
     #endregion
 
@@ -113,6 +138,48 @@ public class PlayerController : MonoBehaviour {
 
         // Apply the velocity
         playerRigidbody.velocity = localVelocity;
+
+        // FireWeapon when mouse1 is down
+        if (Input.GetMouseButtonDown(0))
+        {
+            FireWeapon();
+        }
+    }
+
+    private void FireWeapon()
+    {
+        // Initialize the ray
+        ray = Camera.main.ViewportPointToRay(centerVector);
+
+        // Draws the above ray for a length of `rayDistance` meters, in green.
+        // The length will be the same as the length in the actual raycast.
+        Debug.DrawRay(ray.origin, ray.direction * 50, Color.red);
+
+        // cast the ray
+        // Note: didn't create a reference variable for the bool return, since I figured a bool takes up so little memory (but not sure if that's true)
+        bool didHit = Physics.Raycast(ray, out hitInfo);
+
+        // Send event to object if hit
+        if (didHit)
+        {
+            hitCollider = hitInfo.collider;
+            if (hitCollider.tag == "Enemy")
+            {
+                hitCollider.SendMessage("OnShot", damage);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Kill the player
+    /// </summary>
+    public void Die()
+    {
+        // Detach all children
+        this.transform.DetachChildren();
+
+        // Destroy player object
+        Destroy(this.gameObject);
     }
 
     #endregion

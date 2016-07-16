@@ -146,14 +146,14 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    #endregion
+
+    #region Helper Functions
+
     private void FireWeapon()
     {
         // Initialize the ray
         ray = Camera.main.ViewportPointToRay(centerVector);
-
-        // Draws the above ray for a length of `rayDistance` meters, in green.
-        // The length will be the same as the length in the actual raycast.
-        Debug.DrawRay(ray.origin, ray.direction * 50, Color.red);
 
         // cast the ray
         // Note: didn't create a reference variable for the bool return, since I figured a bool takes up so little memory (but not sure if that's true)

@@ -6,6 +6,8 @@ using System.Collections;
 /// (I probably should have inherited from game controller, but I'm not sure how I should use inheritance with Unity)
 /// </summary>
 public class SeekingEnemyController : MonoBehaviour {
+    #region Reference Variables
+
     /// <summary>
     /// Reference to player's transform
     /// </summary>
@@ -25,6 +27,10 @@ public class SeekingEnemyController : MonoBehaviour {
     /// Reference to the game controller
     /// </summary>
     private GameController gameController = null;
+
+    #endregion
+
+    #region Enemy Config
 
     [Header("--- Enemy Config ---")]
 
@@ -47,6 +53,10 @@ public class SeekingEnemyController : MonoBehaviour {
     /// The delay between attacks in seconds
     /// </summary>
     [SerializeField] private float attackDelay = 1000.0f;
+
+    #endregion
+
+    #region Calculation variables
 
     /// <summary>
     /// Our current health
@@ -73,6 +83,10 @@ public class SeekingEnemyController : MonoBehaviour {
     /// </summary>
     private float lastAttackTime = 0;
 
+    #endregion
+
+    #region Helper Functions
+
     /// <summary>
     /// Modify the health of enemy
     /// </summary>
@@ -85,6 +99,7 @@ public class SeekingEnemyController : MonoBehaviour {
         // Destroy enemy when health goes below 0
         if (health <= 0)
         {
+            gameController.SendMessage("OnEnemyDeath");
             this.transform.DetachChildren();
             Destroy(this.gameObject);
         }
@@ -99,10 +114,14 @@ public class SeekingEnemyController : MonoBehaviour {
         myMaterial.color = color;
     }
 
-	/// <summary>
+    #endregion
+
+    #region Event Handlers
+
+    /// <summary>
     /// Initialize references
     /// </summary>
-	private void Awake()
+    private void Awake()
     {
         // There should only be one player, but if we ever make this a multiplayer game, then we might want to reconsider this method of initialization
         playerTransform = GameObject.FindWithTag("Player").transform;
@@ -169,4 +188,6 @@ public class SeekingEnemyController : MonoBehaviour {
         currentColor.g = originalColor.g * health / maxHealth;
         ChangeColor(currentColor);
     }
+
+    #endregion
 }

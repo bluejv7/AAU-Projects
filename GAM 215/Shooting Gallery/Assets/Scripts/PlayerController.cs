@@ -5,6 +5,18 @@ using System.Collections;
 /// Handles calls relating to the player object and handling events (like movement)
 /// </summary>
 public class PlayerController : MonoBehaviour {
+    #region Enums or structs
+
+    /// <summary>
+    /// The types of weapons we'll have
+    /// </summary>
+    private enum WEAPON
+    {
+        RAYCAST_PISTOL, SPREAD_SHOT
+    };
+
+    #endregion
+
     #region Reference Variables
 
     // This header is useless (won't show up in debug), but if, for some strange reason,
@@ -15,6 +27,11 @@ public class PlayerController : MonoBehaviour {
     /// Reference variable for the player's rigidbody
     /// </summary>
     private Rigidbody playerRigidbody = null;
+
+    /// <summary>
+    /// The spread shot we will spawn when firing that weapon
+    /// </summary>
+    [SerializeField] private GameObject spreadShot = null;
 
     #endregion
 
@@ -56,7 +73,7 @@ public class PlayerController : MonoBehaviour {
     #endregion
 
     #region Calculation Variables
-    
+
     [Header("--- Calculation Variables ---")]
 
     /// <summary>
@@ -90,6 +107,11 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private Vector3 centerVector = new Vector3(0.5f, 0.5f, 0);
 
+    /// <summary>
+    /// The current weapon we are using
+    /// </summary>
+    private WEAPON currentWeapon = WEAPON.RAYCAST_PISTOL;
+
     #endregion
 
     #region Event Handlers
@@ -114,7 +136,7 @@ public class PlayerController : MonoBehaviour {
     private void Start()
     {
         playerRigidbody = this.GetComponent<Rigidbody>();
-        
+
         // freeze rotation to prevent character from falling over
         playerRigidbody.freezeRotation = true;
     }
@@ -139,6 +161,9 @@ public class PlayerController : MonoBehaviour {
         // Apply the velocity
         playerRigidbody.velocity = localVelocity;
 
+        // Go through inputs to see if we need to switch weapons
+        HandleWeaponSwitching();
+
         // FireWeapon when mouse1 is down
         if (Input.GetMouseButtonDown(0))
         {
@@ -150,7 +175,44 @@ public class PlayerController : MonoBehaviour {
 
     #region Helper Functions
 
+    /// <summary>
+    /// Handle all the cases where we switch weapons
+    /// </summary>
+    private void HandleWeaponSwitching()
+    {
+        // If 1, switch to raycast pistol
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentWeapon = WEAPON.RAYCAST_PISTOL;
+        }
+        // If 2, switch to spread shot
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentWeapon = WEAPON.SPREAD_SHOT;
+        }
+    }
+
+    /// <summary>
+    /// Fire the weapon
+    /// </summary>
     private void FireWeapon()
+    {
+        // Call different firing functions depending on the weapon fired
+        if (currentWeapon == WEAPON.RAYCAST_PISTOL)
+        {
+            FireRaycastPistol();
+        }
+        // TODO: Introduce delay for this weapon
+        else if (currentWeapon == WEAPON.SPREAD_SHOT)
+        {
+            FireSpreadShot();
+        }
+    }
+
+    /// <summary>
+    /// Fire raycast pistol
+    /// </summary>
+    private void FireRaycastPistol()
     {
         // Initialize the ray
         ray = Camera.main.ViewportPointToRay(centerVector);
@@ -168,6 +230,14 @@ public class PlayerController : MonoBehaviour {
                 hitCollider.SendMessage("OnShot", damage);
             }
         }
+    }
+
+    /// <summary>
+    /// Fire spread shot -- this will fire 5 bullets in an arc
+    /// </summary>
+    private void FireSpreadShot()
+    {
+        Instantiate(spreadShot, Camera.main.ScreenToWorldPoint(Input.mousePosition), Camera.main.transform.rotation);
     }
 
     /// <summary>

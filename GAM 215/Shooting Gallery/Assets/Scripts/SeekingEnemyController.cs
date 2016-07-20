@@ -61,7 +61,7 @@ public class SeekingEnemyController : MonoBehaviour {
     /// <summary>
     /// Our current health
     /// </summary>
-    private int health = 3;
+    private int health = 0;
 
     /// <summary>
     /// Calculation variable for our velocity (relative to where we are facing)
@@ -132,6 +132,9 @@ public class SeekingEnemyController : MonoBehaviour {
         myMaterial = this.GetComponent<MeshRenderer>().material;
         originalColor = myMaterial.color;
         currentColor = originalColor;
+
+        // Set current health to max health
+        health = maxHealth;
 	}
 	
 	/// <summary>

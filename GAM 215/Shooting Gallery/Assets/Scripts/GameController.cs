@@ -92,6 +92,11 @@ public class GameController : MonoBehaviour {
     /// </summary>
     private int currentWave = 0;
 
+    /// <summary>
+    /// The number of enemies destroyed this wave
+    /// </summary>
+    private int numEnemiesDestroyedThisWave = 0;
+
     #endregion
 
     #region Helper Functions
@@ -134,8 +139,11 @@ public class GameController : MonoBehaviour {
     /// <summary>
     /// Start spawning enemies for the next wave
     /// </summary>
-    public void StartWave()
+    public IEnumerator StartWave()
     {
+        // Reset enemies destroyed this wave
+        numEnemiesDestroyedThisWave = 0;
+
         // Increase counter for the current wave (we started at 0)
         currentWave++;
 
@@ -143,7 +151,7 @@ public class GameController : MonoBehaviour {
         if (currentWave > waves)
         {
             WinGame();
-            return;
+            yield break;
         }
 
         // Update wave text (didn't want to update it if we won the game)
@@ -157,7 +165,23 @@ public class GameController : MonoBehaviour {
         {
             int spawnIndex = Random.Range(0, numSpawnPoints - 1);
             Instantiate(enemy, spawnPoints[spawnIndex].position, Quaternion.identity);
+            yield return new WaitForSeconds(0.25f);
         }
+
+        // This is in case there is a race condition for enemy death event trying to start the wave and failing
+        // ...hopefully this doesn't start two waves in a row, but should be unlikely?
+        if (ShouldStartWave())
+        {
+            StartCoroutine(StartWave());
+        }
+    }
+
+    /// <summary>
+    /// Check to see if we should start spawning waves
+    /// </summary>
+    private bool ShouldStartWave()
+    {
+        return numEnemiesDestroyedThisWave >= enemiesPerWave;
     }
 
     #endregion
@@ -180,7 +204,7 @@ public class GameController : MonoBehaviour {
         }
 
         // Start a wave
-        StartWave();
+        StartCoroutine(StartWave());
 	}
 
     /// <summary>
@@ -188,11 +212,15 @@ public class GameController : MonoBehaviour {
     /// </summary>
     private void OnEnemyDeath()
     {
-        // If the last enemy dies, we should start a new wave
-        // Note: Not keeping a counter on how many enemies die per wave because I'm thinking of creating enemies that spawn more enemies on death
-        if (GameObject.FindGameObjectsWithTag("Enemy").Length == 1)
+        numEnemiesDestroyedThisWave++;
+
+        // If the last enemy dies, we should start a new wave -- don't start a new wave while we are spawning
+        // Note: Previously, I had wanted to avoid keeping a counter on how many enemies were destroyed per wave, but it made it
+        // somwhat hard to eliminate race conditions with StartWave() coroutines... so I think I'll utilize a function to handle
+        // this check in case the check becomes more complicated and get modified by what type of enemy appears
+        if (ShouldStartWave())
         {
-            StartWave();
+            StartCoroutine(StartWave());
         }
     }
 

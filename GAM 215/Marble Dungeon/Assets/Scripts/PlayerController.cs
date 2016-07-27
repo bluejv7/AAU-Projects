@@ -17,6 +17,11 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     [SerializeField] private GameObject projectile = null;
 
+    /// <summary>
+    /// The game controller
+    /// </summary>
+    private GameController gameController;
+
     #endregion
 
     #region Player Config
@@ -136,17 +141,13 @@ public class PlayerController : MonoBehaviour {
             targetRotation = Quaternion.LookRotation(targetPoint - transform.position);
 
             // Create bullet and configure it
-            GameObject currentProjectile = Instantiate(projectile, this.transform.position, targetRotation) as GameObject;
-            BulletController bulletController = currentProjectile.GetComponent<BulletController>();
-            bulletController.damage = damage;
-            bulletController.damageTag = "Enemy";
-            bulletController.spawnTag = this.gameObject.tag;
+            gameController.SpawnProjectile(this.transform.position, targetRotation, this.tag, "Enemy", damage);
         }
     }
 
 #endregion
 
-#region Event Handlers
+    #region Event Handlers
 
     /// <summary>
     /// Initialize variables
@@ -154,6 +155,7 @@ public class PlayerController : MonoBehaviour {
     private void Start()
     {
         playerRigidbody = this.GetComponent<Rigidbody>();
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 	}
 	
 	/// <summary>

@@ -12,6 +12,11 @@ public class BulletController : MonoBehaviour {
     /// </summary>
     private Rigidbody bulletRigidbody = null;
 
+    /// <summary>
+    /// Reference variable for the game controller
+    /// </summary>
+    [SerializeField] private GameController gameController = null;
+
     #endregion
 
     #region Bullet Configs
@@ -87,6 +92,15 @@ public class BulletController : MonoBehaviour {
         return false;
     }
 
+    /// <summary>
+    /// Function for initializing the object after it is enabled
+    /// (Note: It only has one statement right now, but this is just in case we want to initialize other things that should happen more than once)
+    /// </summary>
+    public void initialize()
+    {
+        spawnPoint = this.transform.position;
+    }
+
     #endregion
 
     #region Event Handlers
@@ -96,8 +110,11 @@ public class BulletController : MonoBehaviour {
     /// </summary>
     private void Start()
     {
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         bulletRigidbody = this.GetComponent<Rigidbody>();
-        spawnPoint = this.transform.position;
+
+        // Initialize other properties that may need to be re-initialized later on
+        initialize();
     }
 
 	/// <summary>
@@ -109,17 +126,17 @@ public class BulletController : MonoBehaviour {
         localVelocity = this.transform.TransformDirection(Vector3.forward * speed);
         bulletRigidbody.velocity = localVelocity;
 
-        // Destroy when out of bounds
+        // Return bullet to projectile pool when out of bounds
         if (isPastBoundary())
         {
-            GameObject.Destroy(this.gameObject);
+            gameController.PushPool(this.gameObject);
         }
     }
 
     /// <summary>
     /// Handle collisions for the bullet
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="other">The object we're triggering or the object that triggered us</param>
     private void OnTriggerEnter(Collider other)
     {
         // Send "OnShot" message if the bullet collides with the correct object
@@ -141,8 +158,8 @@ public class BulletController : MonoBehaviour {
             return;
         }
 
-        // Otherwise, destroy the bullet
-        GameObject.Destroy(this.gameObject);
+        // Otherwise, return bullet to the projectile pool
+        gameController.PushPool(this.gameObject);
     }
 
     #endregion

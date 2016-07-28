@@ -1,11 +1,41 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 /// <summary>
 /// Handles overall game logic that doesn't tie closely with other objects (win/lose conditions, spawning, and more)
 /// </summary>
 public class GameController : MonoBehaviour {
+    #region Reference Variables
+
+    /// <summary>
+    /// Reference to ending text
+    /// </summary>
+    [SerializeField] private Text endText = null;
+
+    /// <summary>
+    /// Reference to health text
+    /// </summary>
+    [SerializeField] private Text healthText = null;
+
+    #endregion
+
     #region Game Properties
+
+    /// <summary>
+    /// Message to display when player wins
+    /// </summary>
+    [SerializeField] private string winMessage = "You Win!";
+
+    /// <summary>
+    /// Message to display when player loses
+    /// </summary>
+    [SerializeField] private string loseMessage = "You Lose! =(";
+
+    /// <summary>
+    /// The prefix for the health text
+    /// </summary>
+    [SerializeField] private string healthTextPrefix = "Health: ";
 
     /// <summary>
     /// List of projectiles we'll distribute and collect
@@ -21,6 +51,15 @@ public class GameController : MonoBehaviour {
     /// The amount of projectiles to prefill the pool with
     /// </summary>
     [SerializeField] private int initialPoolSize = 5;
+
+    #endregion
+
+    #region Calculation Variables
+
+    /// <summary>
+    /// Flag for if we won
+    /// </summary>
+    private bool hasWon = false;
 
     #endregion
 
@@ -94,6 +133,28 @@ public class GameController : MonoBehaviour {
         _projectile.SetActive(true);
     }
 
+    /// <summary>
+    /// Do everything to notify player that they've won!
+    /// </summary>
+    private void WinGame()
+    {
+        hasWon = true;
+        endText.text = winMessage;
+    }
+
+    /// <summary>
+    /// Do everything to notify player that they've lost... =(
+    /// </summary>
+    private void LoseGame()
+    {
+        endText.text = loseMessage;
+
+        // Note: Thought about telling the player to destroy itself, but the game controller should be able to step in whenever it feels it needs to
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        player.transform.DetachChildren();
+        GameObject.Destroy(player);
+    }
+
     #endregion
 
     #region Event Handlers
@@ -110,6 +171,30 @@ public class GameController : MonoBehaviour {
             PushPool();
         }
 	}
+
+    /// <summary>
+    /// Decide what to do on a finish event
+    /// </summary>
+    private void OnFinish()
+    {
+        WinGame();
+    }
+
+    /// <summary>
+    /// Handle event for player health change
+    /// </summary>
+    /// <param name="currentHealth">Player's current health</param>
+    private void OnHealthChange(int currentHealth)
+    {
+        // Update health text
+        healthText.text = healthTextPrefix + currentHealth;
+
+        // If our health is 0 or below, we lose... destroy player object
+        if (currentHealth <= 0 && !hasWon)
+        {
+            LoseGame();
+        }
+    }
 
     #endregion
 }

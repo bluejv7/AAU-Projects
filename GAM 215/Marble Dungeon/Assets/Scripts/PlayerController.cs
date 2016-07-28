@@ -46,6 +46,11 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     [SerializeField] private int damage = 1;
 
+    /// <summary>
+    /// The amount of seconds that must pass before getting damaged again
+    /// </summary>
+    [SerializeField] private float damageDelay = 1.0f;
+
     #endregion
 
     #region Input Axis Config
@@ -94,6 +99,16 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private Quaternion targetRotation = Quaternion.identity;
 
+    /// <summary>
+    /// Our current health
+    /// </summary>
+    private int currentHealth = 0;
+
+    /// <summary>
+    /// The last time we were hit
+    /// </summary>
+    private float lastHit = 0;
+
     #endregion
 
     #region Helper Functions
@@ -119,6 +134,7 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private void FireWeapon()
     {
+        // NOTE: I referenced the following code from http://wiki.unity3d.com/index.php?title=LookAtMouse
         // Generate a plane that intersects the transform's position with an upwards normal.
         Plane playerPlane = new Plane(Vector3.up, transform.position);
 
@@ -145,7 +161,19 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-#endregion
+    /// <summary>
+    /// Changes the player's current health
+    /// </summary>
+    /// <param name="value">The amount we want to change the player's health by</param>
+    private void ChangeHealth(int value)
+    {
+        currentHealth += value;
+
+        // Let game controller know our health changed, so we can update the UI
+        gameController.SendMessage("OnHealthChange", currentHealth);
+    }
+
+    #endregion
 
     #region Event Handlers
 
@@ -156,6 +184,10 @@ public class PlayerController : MonoBehaviour {
     {
         playerRigidbody = this.GetComponent<Rigidbody>();
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        currentHealth = maxHealth;
+
+        // Let game controller update UI for health
+        gameController.SendMessage("OnHealthChange", currentHealth);
 	}
 	
 	/// <summary>
@@ -177,5 +209,33 @@ public class PlayerController : MonoBehaviour {
         }
 	}
 
-#endregion
+    /// <summary>
+    /// Decide what to do when enemy hits player
+    /// </summary>
+    /// <param name="damage">The amount of damage to apply</param>
+    private void OnHit(int damage)
+    {
+        float now = Time.time;
+        if (now >= lastHit + damageDelay)
+        {
+            print(now);
+            lastHit = now;
+            ChangeHealth(-damage);
+        }
+    }
+
+    /// <summary>
+    /// Handle trigger events
+    /// </summary>
+    /// <param name="other">The object that we triggered or triggered us</param>
+    private void OnTriggerEnter(Collider other)
+    {
+        // If we reach the goal, notify the game controller that we got to the finish
+        if (other.gameObject.tag == "Finish")
+        {
+            gameController.SendMessage("OnFinish");
+        }
+    }
+
+    #endregion
 }

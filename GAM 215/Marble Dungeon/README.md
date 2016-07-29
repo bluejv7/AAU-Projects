@@ -6,6 +6,7 @@
 
 * BulletController.cs
 * GameController.cs
+* HealthPackController.cs
 * PlayerController.cs
 * SeekingEnemyController.cs
 
@@ -31,6 +32,8 @@ and eventually defeating a final boss blocking the path to freedom.
 4. Added enemy
 5. Added winning trigger
 6. Added UI text (health, win/lose message)
+7. Added animated ninja
+8. Added health pack
 
 ### Script Info
 
@@ -45,6 +48,8 @@ which can be potentially a sphere in 3D space)
 7. Added event handlers for the enemy
 8. Added message sending for the enemy (notify player when attacking/colliding)
 9. Added seek and destroy AI for the enemy
+  1. Prevent AI from moving when it loses track of player
+  (I intentionally want the AI to behave a little dumb)
 10. Added bullet movement
 11. Added bullet message sending (for when it hits something)
 12. Added game controller pooling of projectiles to reduce CPU usage for spawning projectiles
@@ -53,6 +58,8 @@ which can be potentially a sphere in 3D space)
 or consuming projectiles from the pool
 14. Added game controller events and methods for winning/losing the game
 15. Added game controller event handler for updating player health
+16. Added health pack, healing, and modified player's `ChangeHealth()` param to optionally overheal
+the player (provide more current health than max health)
 
 Author: Jv Chen
 
@@ -61,6 +68,8 @@ Author: Jv Chen
 1. My level demonstrates some of the gameplay that will be available for the final project (incomplete)
 2. Made use of at least one array (pooling)
 3. Used a loop to instantiate the pool
+4. Used animations for the ninja and made the EnemyController.cs script update animations based on
+when it attacks
 
 ## Miscellaneous
 

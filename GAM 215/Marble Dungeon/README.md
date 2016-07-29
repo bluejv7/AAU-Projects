@@ -1,6 +1,11 @@
 # Final Project (GAM 215, Module 11, Assignment 11.1: Final Project Part 2)
 
-## Main file locations:
+## Credits
+
+Thanks to "all-animation" for providing the free ninja/zombie animation free of charge at
+https://www.assetstore.unity3d.com/en/#!/content/19256
+
+## Main file locations
 
 ### Script files (Assets/Scripts)
 

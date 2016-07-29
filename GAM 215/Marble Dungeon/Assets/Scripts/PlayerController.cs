@@ -165,9 +165,16 @@ public class PlayerController : MonoBehaviour {
     /// Changes the player's current health
     /// </summary>
     /// <param name="value">The amount we want to change the player's health by</param>
-    private void ChangeHealth(int value)
+    /// <param name="overHeal">Flag if we should heal past the max health</param>
+    private void ChangeHealth(int value, bool overHeal = false)
     {
         currentHealth += value;
+
+        // If we don't want to heal past max health, cap the healing to the max health value
+        if (!overHeal && currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
 
         // Let game controller know our health changed, so we can update the UI
         gameController.SendMessage("OnHealthChange", currentHealth);
@@ -210,21 +217,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Decide what to do when enemy hits player
-    /// </summary>
-    /// <param name="damage">The amount of damage to apply</param>
-    private void OnHit(int damage)
-    {
-        float now = Time.time;
-        if (now >= lastHit + damageDelay)
-        {
-            print(now);
-            lastHit = now;
-            ChangeHealth(-damage);
-        }
-    }
-
-    /// <summary>
     /// Handle trigger events
     /// </summary>
     /// <param name="other">The object that we triggered or triggered us</param>
@@ -235,6 +227,29 @@ public class PlayerController : MonoBehaviour {
         {
             gameController.SendMessage("OnFinish");
         }
+    }
+
+    /// <summary>
+    /// Decide what to do when enemy hits player
+    /// </summary>
+    /// <param name="damage">The amount of damage to apply</param>
+    private void OnHit(int damage)
+    {
+        float now = Time.time;
+        if (now >= lastHit + damageDelay)
+        {
+            lastHit = now;
+            ChangeHealth(-damage);
+        }
+    }
+
+    /// <summary>
+    /// Decide what to do if we are "healed"
+    /// </summary>
+    /// <param name="value">How much we should be healed</param>
+    private void OnHeal(int value)
+    {
+        ChangeHealth(value);
     }
 
     #endregion

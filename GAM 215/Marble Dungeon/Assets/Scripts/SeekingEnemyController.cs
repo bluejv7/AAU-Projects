@@ -17,6 +17,11 @@ public class SeekingEnemyController : MonoBehaviour {
     /// </summary>
     private Rigidbody enemyRigidbody = null;
 
+    /// <summary>
+    /// Our animator component
+    /// </summary>
+    private Animator enemyAnimator = null;
+
     #endregion
 
     #region Enemy Configs
@@ -35,6 +40,11 @@ public class SeekingEnemyController : MonoBehaviour {
     /// Our damage towards the player
     /// </summary>
     [SerializeField] private int damage = 1;
+
+    /// <summary>
+    /// Our max health
+    /// </summary>
+    [SerializeField] private int maxHealth = 4;
 
     #endregion
 
@@ -55,6 +65,11 @@ public class SeekingEnemyController : MonoBehaviour {
     /// </summary>
     private Vector3 localVelocity = Vector3.zero;
 
+    /// <summary>
+    /// Our current health
+    /// </summary>
+    private int currentHealth = 0;
+
     #endregion
 
     #region Helper Functions
@@ -69,6 +84,26 @@ public class SeekingEnemyController : MonoBehaviour {
         enemyRigidbody.velocity = localVelocity;
     }
 
+    /// <summary>
+    /// Handle changes to our current health
+    /// </summary>
+    /// <param name="value">The amount we want to change our health</param>
+    private void ChangeHealth(int value)
+    {
+        currentHealth += value;
+
+        // If we has 0 or less health, destroy ourselves
+        if (currentHealth <= 0)
+        {
+            foreach (Transform child in this.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+            this.transform.DetachChildren();
+            GameObject.Destroy(this.gameObject);
+        }
+    }
+
     #endregion
 
     #region Event Handlers
@@ -80,6 +115,8 @@ public class SeekingEnemyController : MonoBehaviour {
     {
         player = GameObject.FindGameObjectWithTag("Player");
         enemyRigidbody = this.GetComponent<Rigidbody>();
+        enemyAnimator = this.GetComponent<Animator>();
+        currentHealth = maxHealth;
 	}
 	
 	/// <summary>
@@ -87,9 +124,14 @@ public class SeekingEnemyController : MonoBehaviour {
     /// </summary>
 	private void Update()
     {
-        // If player died, don't look check for player
+        // If player died, don't look check for player, stop moving, and stop attacking
         if (!player)
         {
+            enemyRigidbody.velocity = Vector3.zero;
+            if (enemyAnimator)
+            {
+                enemyAnimator.SetBool("idle0ToAttack1", false);
+            }
             return;
         }
 
@@ -101,8 +143,12 @@ public class SeekingEnemyController : MonoBehaviour {
             if (hitInfo.collider.tag == "Player")
             {
                 FollowPlayer();
+                return;
             }
         }
+
+        // Otherwise, don't move
+        enemyRigidbody.velocity = Vector3.zero;
 	}
 
     /// <summary>
@@ -115,7 +161,36 @@ public class SeekingEnemyController : MonoBehaviour {
         if (other.gameObject.tag == "Player")
         {
             other.gameObject.SendMessage("OnHit", damage);
+            if (enemyAnimator)
+            {
+                enemyAnimator.SetBool("idle0ToAttack1", true);
+            }
         }
+    }
+
+    /// <summary>
+    /// Decide what to do when leaving collision with something
+    /// </summary>
+    /// <param name="other">The object we are no longer colliding with</param>
+    private void OnCollisionExit(Collision other)
+    {
+        // If we aren't in range of player, don't animate attack anymore
+        if (other.gameObject.tag == "Player")
+        {
+            if (enemyAnimator)
+            {
+                enemyAnimator.SetBool("idle0ToAttack1", false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handle what happens when we get shot
+    /// </summary>
+    /// <param name="damage">The amount of damage we might take</param>
+    private void OnShot(int damage)
+    {
+        ChangeHealth(-damage);
     }
 
     #endregion

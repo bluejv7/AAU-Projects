@@ -13,9 +13,9 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody playerRigidbody = null;
 
     /// <summary>
-    /// The game object to spawn when we fire a projectile
+    /// Reference to our renderer componenet
     /// </summary>
-    [SerializeField] private GameObject projectile = null;
+    private Renderer playerRenderer = null;
 
     /// <summary>
     /// The game controller
@@ -50,6 +50,21 @@ public class PlayerController : MonoBehaviour {
     /// The amount of seconds that must pass before getting damaged again
     /// </summary>
     [SerializeField] private float damageDelay = 1.0f;
+
+    /// <summary>
+    /// The color to use when player is damaged
+    /// </summary>
+    [SerializeField] private Color damageColor;
+
+    /// <summary>
+    /// How long we should change the color before we change it back (seconds)
+    /// </summary>
+    [SerializeField] private float changeColorDuration = 0.25f;
+
+    /// <summary>
+    /// Sound we should play if we get damaged
+    /// </summary>
+    [SerializeField] private AudioClip damageSound = null;
 
     #endregion
 
@@ -108,6 +123,11 @@ public class PlayerController : MonoBehaviour {
     /// The last time we were hit
     /// </summary>
     private float lastHit = 0;
+
+    /// <summary>
+    /// Our original color
+    /// </summary>
+    private Color originalColor;
 
     #endregion
 
@@ -180,6 +200,28 @@ public class PlayerController : MonoBehaviour {
         gameController.SendMessage("OnHealthChange", currentHealth);
     }
 
+    /// <summary>
+    /// Handles changing the player's damage
+    /// </summary>
+    /// <param name="value">The amount we want to increase our damage by</param>
+    private void ChangeDamage(int value)
+    {
+        damage += value;
+    }
+
+    /// <summary>
+    /// Apply color changes to the player
+    /// </summary>
+    /// <param name="color">The color to change to</param>
+    /// <param name="delay">How many seconds we should wait before changing back</param>
+    /// <returns>An IEnumerator to process a coroutine</returns>
+    private IEnumerator ChangeColor(Color color, float delay)
+    {
+        playerRenderer.material.color = color;
+        yield return new WaitForSeconds(delay);
+        playerRenderer.material.color = originalColor;
+    }
+
     #endregion
 
     #region Event Handlers
@@ -190,8 +232,10 @@ public class PlayerController : MonoBehaviour {
     private void Start()
     {
         playerRigidbody = this.GetComponent<Rigidbody>();
+        playerRenderer = this.GetComponent<Renderer>();
         gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         currentHealth = maxHealth;
+        originalColor = playerRenderer.material.color;
 
         // Let game controller update UI for health
         gameController.SendMessage("OnHealthChange", currentHealth);
@@ -236,10 +280,12 @@ public class PlayerController : MonoBehaviour {
     private void OnHit(int damage)
     {
         float now = Time.time;
+        // If the player is not invincible at this time, apply damage, change color, and play sound
         if (now >= lastHit + damageDelay)
         {
             lastHit = now;
             ChangeHealth(-damage);
+            StartCoroutine(ChangeColor(damageColor, changeColorDuration));
         }
     }
 
@@ -250,6 +296,29 @@ public class PlayerController : MonoBehaviour {
     private void OnHeal(int value)
     {
         ChangeHealth(value);
+    }
+
+    /// <summary>
+    /// Decide what to do if we get a damage increase
+    /// </summary>
+    /// <param name="value">The amount we want to increase our damage by</param>
+    private void OnDamageIncrease(int value)
+    {
+        ChangeDamage(value);
+    }
+
+    /// <summary>
+    /// Handle what happens when we get shot
+    /// </summary>
+    /// <param name="damage">The amount of damage we might take</param>
+    private void OnShot(int damage)
+    {
+        // Apply damage and change color accordingly
+        ChangeHealth(-damage);
+        StartCoroutine(ChangeColor(damageColor, changeColorDuration));
+
+        // Play damage sound
+        AudioSource.PlayClipAtPoint(damageSound, Camera.main.transform.position);
     }
 
     #endregion

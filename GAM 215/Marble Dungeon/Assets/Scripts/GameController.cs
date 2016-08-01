@@ -52,6 +52,11 @@ public class GameController : MonoBehaviour {
     /// </summary>
     [SerializeField] private int initialPoolSize = 5;
 
+    /// <summary>
+    /// Sound to play when spawning projectiles
+    /// </summary>
+    [SerializeField] private AudioClip firingSound = null;
+
     #endregion
 
     #region Calculation Variables
@@ -123,11 +128,14 @@ public class GameController : MonoBehaviour {
         // Modify some other properties of the bullet for collision purposes
         BulletController bulletController = _projectile.GetComponent<BulletController>();
         bulletController.damage = damage;
-        bulletController.damageTag = "Enemy";
+        bulletController.damageTag = damageTag;
         bulletController.spawnTag = spawnTag;
 
         // This initialization makes sure proper values are being set upon enabling the projectile
         bulletController.initialize();
+
+        // Play the firing sound
+        AudioSource.PlayClipAtPoint(firingSound, _projectile.transform.position);
 
         // Enable projectile
         _projectile.SetActive(true);

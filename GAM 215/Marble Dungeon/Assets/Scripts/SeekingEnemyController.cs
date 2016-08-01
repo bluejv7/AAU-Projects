@@ -18,6 +18,11 @@ public class SeekingEnemyController : MonoBehaviour {
     private Rigidbody enemyRigidbody = null;
 
     /// <summary>
+    /// Our renderer component
+    /// </summary>
+    private Renderer enemyRenderer = null;
+
+    /// <summary>
     /// Our animator component
     /// </summary>
     private Animator enemyAnimator = null;
@@ -46,6 +51,26 @@ public class SeekingEnemyController : MonoBehaviour {
     /// </summary>
     [SerializeField] private int maxHealth = 4;
 
+    /// <summary>
+    /// Sound to play when attacking
+    /// </summary>
+    [SerializeField] private AudioClip attackSound = null;
+
+    /// <summary>
+    /// Sound to play when getting damaged
+    /// </summary>
+    [SerializeField] private AudioClip damageSound = null;
+
+    /// <summary>
+    /// The layer name for the projectile
+    /// </summary>
+    [SerializeField] private string projectileLayerName = "Projectile";
+
+    /// <summary>
+    /// Layer name for enemy
+    /// </summary>
+    [SerializeField] private string enemyLayerName = "Enemy";
+
     #endregion
 
     #region Calculation Variables
@@ -69,6 +94,32 @@ public class SeekingEnemyController : MonoBehaviour {
     /// Our current health
     /// </summary>
     private int currentHealth = 0;
+
+    /// <summary>
+    /// The original color of our enemy
+    /// </summary>
+    private Color originalColor;
+
+    /// <summary>
+    /// Enemy's current color (not an actual current color... just a variable instantiated here so we don't have to instantiate it every time enemy is hit)
+    /// </summary>
+    private Color currentColor;
+
+    /// <summary>
+    /// The layer of the projectile
+    /// </summary>
+    private int projectileLayer = 0;
+
+
+    /// <summary>
+    /// Layer of enemy
+    /// </summary>
+    private int enemyLayer = 0;
+
+    /// <summary>
+    /// The calculated layerMask to send for raycasts
+    /// </summary>
+    private int layerMask = 0;
 
     #endregion
 
@@ -104,6 +155,30 @@ public class SeekingEnemyController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Change the color of the enemy
+    /// </summary>
+    private void ChangeColor()
+    {
+        currentColor.g = originalColor.g * currentHealth / maxHealth;
+        currentColor.b = originalColor.b * currentHealth / maxHealth;
+        enemyRenderer.material.color = currentColor;
+    }
+
+    /// <summary>
+    /// Handle rendering of different enemies
+    /// </summary>
+    private void InitRenderer()
+    {
+        enemyRenderer = this.GetComponent<Renderer>();
+
+        // If we can't grab the renderer from our object, look in the children
+        if (!enemyRenderer)
+        {
+            enemyRenderer = this.GetComponentInChildren<Renderer>();
+        }
+    }
+
     #endregion
 
     #region Event Handlers
@@ -115,8 +190,23 @@ public class SeekingEnemyController : MonoBehaviour {
     {
         player = GameObject.FindGameObjectWithTag("Player");
         enemyRigidbody = this.GetComponent<Rigidbody>();
+
+        // Initialize `enemyRenderer` variable based on the enemy
+        InitRenderer();
+
+        originalColor = enemyRenderer.material.color;
+        currentColor = originalColor;
         enemyAnimator = this.GetComponent<Animator>();
         currentHealth = maxHealth;
+
+        // Get the projectile layer, bitshift to get the projectile layer and enemy as the mask, and then invert the mask so we raycast past the projectile
+        // Got help from (http://answers.unity3d.com/questions/55829/help-with-ignoring-collider-with-raycast.html)
+        // Also got help with (http://answers.unity3d.com/questions/416919/making-raycast-ignore-multiple-layers.html) for ignoring multiple layers
+        projectileLayer = LayerMask.NameToLayer(projectileLayerName);
+        enemyLayer = LayerMask.NameToLayer(enemyLayerName);
+        layerMask = 1 << projectileLayer;
+        layerMask |= (1 << enemyLayer);
+        layerMask = ~layerMask;
 	}
 	
 	/// <summary>
@@ -137,7 +227,7 @@ public class SeekingEnemyController : MonoBehaviour {
 
         // Check if player is within visibility distance using raycast
         ray = new Ray(this.transform.position, player.transform.position - this.transform.position);
-        if (Physics.Raycast(ray, out hitInfo, visibilityDistance))
+        if (Physics.Raycast(ray, out hitInfo, visibilityDistance, layerMask))
         {
             // If raycast hits player, follow player
             if (hitInfo.collider.tag == "Player")
@@ -161,10 +251,15 @@ public class SeekingEnemyController : MonoBehaviour {
         if (other.gameObject.tag == "Player")
         {
             other.gameObject.SendMessage("OnHit", damage);
+
+            // Animate attack
             if (enemyAnimator)
             {
                 enemyAnimator.SetBool("idle0ToAttack1", true);
             }
+
+            // Play attack sound
+            AudioSource.PlayClipAtPoint(attackSound, this.transform.position);
         }
     }
 
@@ -190,7 +285,12 @@ public class SeekingEnemyController : MonoBehaviour {
     /// <param name="damage">The amount of damage we might take</param>
     private void OnShot(int damage)
     {
+        // Try to hurt the enemy and change color accordingly
         ChangeHealth(-damage);
+        ChangeColor();
+
+        // Play damage sound
+        AudioSource.PlayClipAtPoint(damageSound, this.transform.position);
     }
 
     #endregion

@@ -84,7 +84,7 @@ public class BulletController : MonoBehaviour {
     /// <returns></returns>
     private bool isPastBoundary()
     {
-        if (Mathf.Abs(this.transform.position.x) > boundaryX || Mathf.Abs(this.transform.position.z) > boundaryZ)
+        if (Mathf.Abs(this.transform.position.x - spawnPoint.x) > boundaryX || Mathf.Abs(this.transform.position.z - spawnPoint.z) > boundaryZ)
         {
             return true;
         }

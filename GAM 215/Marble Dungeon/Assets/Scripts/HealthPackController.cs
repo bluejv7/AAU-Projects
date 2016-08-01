@@ -16,6 +16,11 @@ public class HealthPackController : MonoBehaviour {
     [SerializeField] private float rotationAngle = 2.0f;
 
     /// <summary>
+    /// The sound to use when something is healed
+    /// </summary>
+    [SerializeField] private AudioClip healSound = null;
+
+    /// <summary>
     /// Our last rotation
     /// </summary>
     private Vector3 previousRotation = Vector3.zero;
@@ -55,6 +60,11 @@ public class HealthPackController : MonoBehaviour {
         if (other.gameObject.tag == "Player")
         {
             other.SendMessage("OnHeal", damageHealed);
+
+            // Player sounds
+            AudioSource.PlayClipAtPoint(healSound, Camera.main.transform.position);
+
+            // Destroy health
             this.transform.DetachChildren();
             GameObject.Destroy(this.gameObject);
         }

@@ -250,14 +250,15 @@ public class ShootingEnemyController : MonoBehaviour
         ray = new Ray(this.transform.position, player.transform.position - this.transform.position);
         if (Physics.Raycast(ray, out hitInfo, visibilityDistance, layerMask))
         {
+            bool isPlayer = hitInfo.collider.tag == "Player";
             // If raycast hits player, shoot at player
-            if (hitInfo.collider.tag == "Player")
+            if (isPlayer)
             {
                 ShootAtPlayer();
             }
 
             // If player is too close to us, move backwards
-            if (hitInfo.distance < initialFleeDistance)
+            if (isPlayer && hitInfo.distance < initialFleeDistance)
             {
                 RunFromPlayer();
             }

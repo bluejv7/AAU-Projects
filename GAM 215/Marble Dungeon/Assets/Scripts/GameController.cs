@@ -57,6 +57,11 @@ public class GameController : MonoBehaviour {
     /// </summary>
     [SerializeField] private AudioClip firingSound = null;
 
+    /// <summary>
+    /// Sound to play when we win
+    /// </summary>
+    [SerializeField] private AudioClip victorySound = null;
+
     #endregion
 
     #region Calculation Variables
@@ -186,6 +191,7 @@ public class GameController : MonoBehaviour {
     private void OnFinish()
     {
         WinGame();
+        AudioSource.PlayClipAtPoint(victorySound, Camera.main.transform.position);
     }
 
     /// <summary>

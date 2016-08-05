@@ -123,7 +123,7 @@ public class GameController : MonoBehaviour {
     /// <param name="spawnTag">The tag that spawned the projectile (so we don't collide with the creator)</param>
     /// <param name="damageTag">The object tag we want to damage</param>
     /// <param name="damage">The amount of damage we want to inflict</param>
-    public void SpawnProjectile(Vector3 spawnPosition, Quaternion rotation, string spawnTag, string damageTag, int damage)
+    public void SpawnProjectile(Vector3 spawnPosition, Quaternion rotation, string spawnTag, string damageTag, int damage, bool collideWithSelf = true)
     {
         // Get a projectile and give it the correct position/rotation
         GameObject _projectile = PopPool();
@@ -135,6 +135,7 @@ public class GameController : MonoBehaviour {
         bulletController.damage = damage;
         bulletController.damageTag = damageTag;
         bulletController.spawnTag = spawnTag;
+        bulletController.collideWithSelf = collideWithSelf;
 
         // This initialization makes sure proper values are being set upon enabling the projectile
         bulletController.initialize();

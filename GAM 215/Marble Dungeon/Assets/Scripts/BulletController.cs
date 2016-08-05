@@ -29,12 +29,12 @@ public class BulletController : MonoBehaviour {
     /// <summary>
     /// The X boundaries for the bullet
     /// </summary>
-    [SerializeField] private float boundaryX = 50f;
+    [SerializeField] private float boundaryX = 50.0f;
 
     /// <summary>
     /// The Z boundaries for the bullet
     /// </summary>
-    [SerializeField] private float boundaryZ = 50f;
+    [SerializeField] private float boundaryZ = 50.0f;
 
     /// <summary>
     /// The amount of damage the bullet will inflict
@@ -73,6 +73,11 @@ public class BulletController : MonoBehaviour {
     /// The tag of the object that spawn this bullet
     /// </summary>
     public string spawnTag = "";
+
+    /// <summary>
+    /// Allow bullets to collide with themselvess
+    /// </summary>
+    public bool collideWithSelf = true;
 
     #endregion
 
@@ -154,6 +159,12 @@ public class BulletController : MonoBehaviour {
 
         // Don't destroy bullet if the trigger is the one that spawned it
         if (tag == spawnTag)
+        {
+            return;
+        }
+
+        // If we don't allow it, bullets won't destroy themselves if they're spawned from the same thing
+        if (tag == this.tag && spawnTag == other.gameObject.GetComponent<BulletController>().spawnTag && !collideWithSelf)
         {
             return;
         }

@@ -64,16 +64,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Imported Assets\Zombie_0_3\Script\PlayGUI.cs" />
-    <Compile Include="Assets\Scripts\BossController.cs" />
-    <Compile Include="Assets\Scripts\BulletController.cs" />
-    <Compile Include="Assets\Scripts\CameraController.cs" />
-    <Compile Include="Assets\Scripts\DamageBoostController.cs" />
-    <Compile Include="Assets\Scripts\GameController.cs" />
-    <Compile Include="Assets\Scripts\HealthPackController.cs" />
-    <Compile Include="Assets\Scripts\PlayerAnimatorController.cs" />
-    <Compile Include="Assets\Scripts\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\SeekingEnemyController.cs" />
-    <Compile Include="Assets\Scripts\ShootingEnemyController.cs" />
+    <Compile Include="Assets\Scripts\Game\BossController.cs" />
+    <Compile Include="Assets\Scripts\Game\BulletController.cs" />
+    <Compile Include="Assets\Scripts\Game\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Game\DamageBoostController.cs" />
+    <Compile Include="Assets\Scripts\Game\GameController.cs" />
+    <Compile Include="Assets\Scripts\Game\HealthPackController.cs" />
+    <Compile Include="Assets\Scripts\Game\PlayerAnimatorController.cs" />
+    <Compile Include="Assets\Scripts\Game\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Game\SeekingEnemyController.cs" />
+    <Compile Include="Assets\Scripts\Game\ShootingEnemyController.cs" />
+    <Compile Include="Assets\Scripts\Lose\MainMenuButtonController.cs" />
+    <Compile Include="Assets\Scripts\Title\InstructionsButtonController.cs" />
+    <Compile Include="Assets\Scripts\Title\InstructionsPanelController.cs" />
+    <Compile Include="Assets\Scripts\Title\StartButtonController.cs" />
+    <Compile Include="Assets\Scripts\Title\StoryButtonController.cs" />
+    <Compile Include="Assets\Scripts\Title\StoryPanelController.cs" />
+    <Compile Include="Assets\Scripts\Win\CreditPanelController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Imported Assets\Zombie_0_3\AnimationFrameTable\Zombie_0_3.txt" />

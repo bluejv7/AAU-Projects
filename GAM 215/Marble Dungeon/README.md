@@ -1,4 +1,4 @@
-# Final Project (GAM 215, Module 13, Assignment 13.1: Final Project Part 4 -- Scripted Audio)
+# Final Project (GAM 215, Module 14, Assignment 14.1: Final Project Part 5 -- Complete)
 
 ## Credits
 
@@ -8,10 +8,22 @@ https://www.assetstore.unity3d.com/en/#!/content/19256
 https://www.assetstore.unity3d.com/en/#!/content/54116
 * "Muz Station Productions" for providing free music tracks for free at
 https://www.assetstore.unity3d.com/en/#!/content/10623
+* "Ray Larabie" for the Antique Font Pack -- free at
+https://www.assetstore.unity3d.com/en/#!/content/4233
 
 ## Main file locations
 
 ### Script files (Assets/Scripts)
+
+#### Title
+
+* InstructionsButtonController.cs
+* InstructionsPanelController.cs
+* StartButtonController.cs
+* StoryButtonController.cs
+* StoryPanelController.cs
+
+#### Game
 
 * BossController.cs
 * BulletController.cs
@@ -24,9 +36,20 @@ https://www.assetstore.unity3d.com/en/#!/content/10623
 * SeekingEnemyController.cs
 * ShootingEnemyController.cs
 
+#### Lose
+
+* MainMenuButtonController.cs
+
+#### Win
+
+* CreditPanelController.cs
+
 ### Scene files (Assets/Scenes)
 
 * Game Scene.unity
+* Lose Scene.unity
+* Title Scnee.unity
+* Win Scene.unity
 
 ## Project information
 
@@ -51,8 +74,12 @@ and eventually defeating a final boss blocking the path to freedom.
 9. Added damage boost power up
 10. Added shooting enemy
 11. Added boss
-12. Added animations for the player
+12. Added animations for the player (and fixed it so the model doesn't affect movement)
 13. Added looping music
+14. Added title, lose, and win scenes
+15. Added start button, story and instructions to the title
+16. Added button to go to main menu from the lose scene
+17. Added credits to the win scene
 
 ### Script Info
 
@@ -86,6 +113,12 @@ the player (provide more current health than max health)
 19. Added animation controller for handling player animation state
 20. Added sounds triggered by player damage, enemy damage, enemy attack, bullet spawning,
 and winning the game
+21. Added boss firing patterns
+22. Fixed bug with player taking projectile damage during invincibility frames
+23. Made killing the boss a requirement for reaching the end goal
+24. Made goal walls green to help indicate it is near the goal
+25. Created scripts to handle title menu buttons and to disable instructions/story panels
+26. Created scripts to handle filling out the credits in the win scene
 
 Author: Jv Chen
 
@@ -101,9 +134,33 @@ animation states changing
   (player damage, enemy damage, enemy attack, bullet firing, and winning the game)
   * 1 is done through just playing it on an audio source component
   (doesn't count towards required 4 sound files)
+6. Contains 4 scenes
+  1. Title
+  2. Game
+  3. Lose
+  4. Win
+7. Instructions (on the title screen)
+8. Complete credits (on the win screen)
+9. Coroutines used in one of the boss firing patterns and the player's color change on damage
+10. GUI updates to display health efficiently and accurately
+(could be updated to display damage, but I kind of like having the damage be hidden and shown instead
+by how fast the enemies are dying)
+11. Controls implemented, captured by Input Manager, and applied only once per frame
+12. Variables are sorted into public, private, and [SerializeField] private when appropriate
+13. Triggers/colliders used appropriately
+14. Game should be error free
+15. Raycasting is performed accurately and efficiently
+16. Spawning is performed efficiently (bullets are spawned using pools and pool will only grow if needed)
+17. Rigidbody physics are used for player and enemies
+18. There is a progressive level of difficulty
 
 ## Miscellaneous
 
 This README is a markdown file that can be generated into an HTML page at http://daringfireball.net/projects/markdown/dingus or
 in my Github page (https://github.com/bluejv7/AAU-Projects/tree/master/GAM%20215/Marble%20Dungeon).  You can always check my Github account to see if anyone
 plagiarized my work or if I have done the same to others.  Academic integrity is important!
+
+This was the coolest project I've ever had the chance to work on and it felt great!  There's definitely
+more I could have done if there were less circumstances that limited my time after work, but I've
+learned so much from this experience!  Many thanks to Scott Berkenkotter for all the feedback, responses
+to my questions/comments, and for teaching this course!

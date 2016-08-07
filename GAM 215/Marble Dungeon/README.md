@@ -113,7 +113,7 @@ the player (provide more current health than max health)
 19. Added animation controller for handling player animation state
 20. Added sounds triggered by player damage, enemy damage, enemy attack, bullet spawning,
 and winning the game
-21. Added boss firing patterns
+21. Added boss firing patterns (Circular, alternating circular, spiral, and targeting)
 22. Fixed bug with player taking projectile damage during invincibility frames
 23. Made killing the boss a requirement for reaching the end goal
 24. Made goal walls green to help indicate it is near the goal

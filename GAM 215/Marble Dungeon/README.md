@@ -160,6 +160,8 @@ This README is a markdown file that can be generated into an HTML page at http:/
 in my Github page (https://github.com/bluejv7/AAU-Projects/tree/master/GAM%20215/Marble%20Dungeon).  You can always check my Github account to see if anyone
 plagiarized my work or if I have done the same to others.  Academic integrity is important!
 
+The game can be demoed at https://bluejv7.github.io/AAU-Projects/bin/marble-dungeon/
+
 This was the coolest project I've ever had the chance to work on and it felt great!  There's definitely
 more I could have done if there were less circumstances that limited my time after work, but I've
 learned so much from this experience!  Many thanks to Scott Berkenkotter for all the feedback, responses

@@ -49,6 +49,11 @@ public class BossController : MonoBehaviour {
     /// </summary>
     private Renderer bossRenderer = null;
 
+    /// <summary>
+    /// The boss's targeting object's transfrom
+    /// </summary>
+    [SerializeField] private Transform bossTargetingTransform = null;
+
     #endregion
 
     #region Boss Configs
@@ -67,6 +72,16 @@ public class BossController : MonoBehaviour {
     /// The max health of the boss
     /// </summary>
     [SerializeField] private int maxHealth = 800;
+
+    /// <summary>
+    /// Health must be less than or equal to this amount to be angry
+    /// </summary>
+    [SerializeField] private int angryHealth = 400;
+
+    /// <summary>
+    /// Health must be less than or equal to this amount to be critical
+    /// </summary>
+    [SerializeField] private int criticalHealth = 200;
 
     /// <summary>
     /// Our damage
@@ -92,6 +107,21 @@ public class BossController : MonoBehaviour {
     /// How many seconds to wait before doing the second wave attack in `ALTERNATING_CIRCULAR`
     /// </summary>
     [SerializeField] private float alternatingDelay = 1.0f;
+
+    /// <summary>
+    /// Seconds to wait between each fire of the spiral pattern
+    /// </summary>
+    [SerializeField] private float spiralDelay = 0.1f;
+
+    /// <summary>
+    /// Seconds to wait between each fire towards player
+    /// </summary>
+    [SerializeField] private float targetDelay = 0.25f;
+
+    /// <summary>
+    /// How many shots to fire at the player for target attack
+    /// </summary>
+    [SerializeField] private int targetNumShots = 8;
 
     #endregion
 
@@ -191,9 +221,12 @@ public class BossController : MonoBehaviour {
         }
 
         currentHealth = maxHealth;
+        numRotationSteps = (int)(DEGREES_IN_CIRCLE / circularAngle);
+
+        // Make sure spawn position and bossTargetingTransform are positioned at the same height as the player
         spawnPosition = this.transform.position;
         spawnPosition.y = player.transform.position.y;
-        numRotationSteps = (int)(DEGREES_IN_CIRCLE / circularAngle);
+        bossTargetingTransform.position.Set(bossTargetingTransform.position.x, spawnPosition.y, bossTargetingTransform.position.z);
     }
 	
 	/// <summary>
@@ -227,6 +260,9 @@ public class BossController : MonoBehaviour {
     /// </summary>
     private void OnDestroy()
     {
+        // Exit early if gameController is destroyed
+        if (!gameController) return;
+
         // Tell game controller we died
         gameController.SendMessage("OnBossDeath");
     }
@@ -241,11 +277,11 @@ public class BossController : MonoBehaviour {
     private void ApplyState()
     {
         // TODO: Make variables to save calculation for state health values
-        if (currentHealth <= maxHealth / 10 && false)
+        if (currentHealth <= criticalHealth)
         {
             currentState = State.CRITICAL;
         }
-        else if (currentHealth <= maxHealth / 2 && false)
+        else if (currentHealth <= angryHealth)
         {
             currentState = State.ANGRY;
         }
@@ -289,12 +325,59 @@ public class BossController : MonoBehaviour {
         {
             StartCoroutine(AlternatingCircularAttack(this.transform.rotation.eulerAngles, numRotationSteps / 2, circularAngle));
         }
+        else if (currentAttack == Attack.SPIRAL)
+        {
+            StartCoroutine(SpiralAttack(this.transform.rotation.eulerAngles, numRotationSteps, circularAngle));
+        }
+        else if (currentAttack == Attack.TARGET)
+        {
+            StartCoroutine(TargetAttack());
+        }
+    }
+
+    /// <summary>
+    /// An attack that just aims at the player
+    /// </summary>
+    /// <returns>IEnumerator for coroutine handling</returns>
+    private IEnumerator TargetAttack()
+    {
+        Vector3 currentRotation = Vector3.zero;
+        for (int i = 0; i < targetNumShots; i++)
+        {
+            bossTargetingTransform.LookAt(player.transform);
+            currentRotation = bossTargetingTransform.eulerAngles;
+            gameController.SpawnProjectile(spawnPosition, Quaternion.Euler(currentRotation), this.tag, player.tag, damage, false);
+            yield return new WaitForSeconds(targetDelay);
+        }
+    }
+
+    /// <summary>
+    /// A spiral attack, which is basically one by one attack in a circular motion
+    /// </summary>
+    /// <param name="initialRotation">The directional vector for the first projectile</param>
+    /// <param name="numRotationSteps">How many times we'll apply rotations</param>
+    /// <param name="circularAngle">The angle we'll use to apply the rotations</param>
+    /// <returns>IEnumerator for coroutine handling</returns>
+    private IEnumerator SpiralAttack(Vector3 initialRotation, int numRotationSteps, float circularAngle)
+    {
+        Vector3 currentRotation = initialRotation;
+        for (int i = 0; i < numRotationSteps; i++)
+        {
+            currentRotation.y = initialRotation.y + circularAngle * i;
+            CircularAttack(currentRotation, 1);
+            yield return new WaitForSeconds(spiralDelay);
+        }
     }
 
     /// <summary>
     /// An attack that spawns bullets in a circle around us
     /// </summary>
-    private void CircularAttack(Vector3 initialRotation, int numRotationSteps, float circularAngle, int startIndex = 0, int increment = 1)
+    /// <param name="initialRotation">The directional vector for the first projectile</param>
+    /// <param name="numRotationSteps">How many times we'll apply rotations</param>
+    /// <param name="circularAngle">The angle we'll use to apply the rotations</param>
+    /// <param name="startIndex">The rotation step to start at</param>
+    /// <param name="increment">The number to add to each rotation step (ex. every step is 1 and every other step is 2)</param>
+    private void CircularAttack(Vector3 initialRotation, int numRotationSteps, float circularAngle = 0, int startIndex = 0, int increment = 1)
     {
         Vector3 currentRotation = initialRotation;
 
@@ -309,6 +392,10 @@ public class BossController : MonoBehaviour {
     /// <summary>
     /// Similar to circular attack, but does two waves of attacks
     /// </summary>
+    /// <param name="initialRotation">The directional vector for the first projectile</param>
+    /// <param name="numRotationSteps">How many times we'll apply rotations</param>
+    /// <param name="circularAngle">The angle we'll use to apply the rotations</param>
+    /// <returns>IEnumerator for coroutine handling</returns>
     private IEnumerator AlternatingCircularAttack(Vector3 initialRotation, int numRotationSteps, float circularAngle)
     {
         float newCircularAngle = circularAngle * 2;

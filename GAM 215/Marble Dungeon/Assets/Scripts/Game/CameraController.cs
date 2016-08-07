@@ -34,6 +34,9 @@ public class CameraController : MonoBehaviour {
     /// </summary>
 	private void Update()
     {
+        // Exit early if player dies
+        if (!player) return;
+
         newPosition.x = player.transform.position.x;
         newPosition.y = initialPosition.y;
         newPosition.z = player.transform.position.z + initialPosition.z;
